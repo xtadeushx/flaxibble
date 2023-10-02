@@ -14,10 +14,23 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.NEXT_GOOGLE_CLIENT_SECRET || '',
     }),
   ],
-  // jwt: {
-  //   encode: async ({ secret, token }) => {},
-  //   decode: async ({ secret, token }) => {},
-  // },
+  jwt: {
+    encode: async ({ secret, token }) => {
+      const encodedToken = jsonwebtoken.sign(
+        {
+          ...token,
+          iss: 'grafbase',
+          exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
+        },
+        secret
+      );
+      return encodedToken;
+    },
+    decode: async ({ secret, token }) => {
+      const decodedToken = jsonwebtoken.verify(token!, secret) as JWT;
+      return decodedToken;
+    },
+  },
   theme: {
     colorScheme: 'light',
     logo: '/logo.png',
@@ -29,6 +42,7 @@ export const authOptions: NextAuthOptions = {
         const data = (await getUser(email as string)) as {
           user?: UserProfile;
         };
+
         const newSession = {
           ...session,
           user: {
@@ -48,14 +62,14 @@ export const authOptions: NextAuthOptions = {
         const userExists = (await getUser(user?.email as string)) as {
           user?: UserProfile;
         };
-
-        if (!userExists.user) {
-          await createUser(
-            user?.email as string,
-            user.name as string,
-            user.image as string
-          );
-        }
+        console.log('signIn', userExists);
+        // if (!userExists.user) {
+        //   await createUser(
+        //     user?.email as string,
+        //     user.name as string,
+        //     user.image as string
+        //   );
+        // }
         return true;
       } catch (error: any) {
         console.log(error);
@@ -67,6 +81,5 @@ export const authOptions: NextAuthOptions = {
 
 export async function getCurrentUser() {
   const session = (await getServerSession(authOptions)) as SessionInterface;
-  console.log('session', session);
   return session;
 }
