@@ -6,6 +6,7 @@ import FormField from "./FormField";
 import CustomMenu from "./CustomMenu";
 import { categoryFilters } from "@/constants";
 import { useState } from "react";
+import Button from "./Button";
 
 interface ProjectFormProps {
   type: 'create' | 'edit';
@@ -24,9 +25,41 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
   });
 
   const handleFormSubmit = (e: React.FormEvent) => {
-  }
+    e.preventDefault();
+    setSsSubmitting(true);
+
+    try {
+      if (type === 'create') {
+
+      }
+    } catch (error) {
+
+    }
+  };
+
   const handleChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-  }
+    e.preventDefault();
+
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.includes('image')) {
+      alert('Please upload an image!');
+
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const result = reader.result as string;
+
+      handleStateChange("image", result)
+    };
+  };
 
   const handleStateChange = (fieldName: string, value: string) => {
     setForm((prev) => ({
@@ -50,9 +83,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
           accept="image/*"
           required={type === 'create'}
           className="form_image-input"
-          onChange={handleChangeImage}
+          onChange={(e) => handleChangeImage(e)}
         />
-        {!form.image &&
+        {form.image &&
           <Image
             alt="Project poster"
             src={form?.image}
@@ -95,7 +128,12 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
       />
 
       <div className="flexStart w-full">
-        <button>Create</button>
+        <Button
+          title={isSubmitting ? `${type === "create" ? "Creating" : "Editing"}` : `${type === "create" ? "Create" : "Edit"}`}
+          type='submit'
+          leftIcon={isSubmitting ? '' : '/plus.svg'}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </form>
   )
