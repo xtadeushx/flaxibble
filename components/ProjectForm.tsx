@@ -32,7 +32,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
     setSsSubmitting(true);
 
     const { token } = await fetchToken();
-
+    console.log('token', token);
     try {
       if (type === 'create') {
         await createNewProject(form, session?.user?.id, token);
@@ -82,26 +82,25 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
       onSubmit={handleFormSubmit}
       className="flexStart form"
     >
-      <div className="flexStart flex_image_container">
+      <div className="flexStart form_image-container">
         <label htmlFor="poster" className="flexCenter form_image-label">
           {!form.image && 'Choose a poster for your project'}
         </label>
         <input
+          id="image"
           type="file"
-          id='image'
-          accept="image/*"
-          required={type === 'create'}
+          accept='image/*'
+          required={type === "create" ? true : false}
           className="form_image-input"
           onChange={(e) => handleChangeImage(e)}
         />
-        {form.image &&
+        {form.image && (
           <Image
-            alt="Project poster"
             src={form?.image}
+            className="sm:p-10 object-contain z-20" alt="image"
             fill
-            className="sm:p-10 object-contain z-20"
           />
-        }
+        )}
       </div>
       <FormField
         title='Title'
