@@ -10,8 +10,8 @@ import { createUser, getUser } from './actions';
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.NEXT_GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.NEXT_GOOGLE_CLIENT_SECRET || '',
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     }),
   ],
   jwt: {
@@ -42,7 +42,6 @@ export const authOptions: NextAuthOptions = {
         const data = (await getUser(email as string)) as {
           user?: UserProfile;
         };
-
         const newSession = {
           ...session,
           user: {
@@ -62,7 +61,6 @@ export const authOptions: NextAuthOptions = {
         const userExists = (await getUser(user?.email as string)) as {
           user?: UserProfile;
         };
-        console.log('signIn', userExists);
         // if (!userExists.user) {
         //   await createUser(
         //     user?.email as string,
