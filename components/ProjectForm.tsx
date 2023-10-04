@@ -7,6 +7,8 @@ import CustomMenu from "./CustomMenu";
 import { categoryFilters } from "@/constants";
 import { useState } from "react";
 import Button from "./Button";
+import { createNewProject, fetchToken } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 interface ProjectFormProps {
   type: 'create' | 'edit';
@@ -14,26 +16,33 @@ interface ProjectFormProps {
 }
 
 const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
+  const router = useRouter()
   const [isSubmitting, setSsSubmitting] = useState(false)
   const [form, setForm] = useState({
     image: '',
     title: '',
     description: '',
     liveSiteUrl: '',
-    gitHubUrl: '',
+    githubUrl: '',
     category: ''
   });
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSsSubmitting(true);
 
+    const { token } = await fetchToken();
+
     try {
       if (type === 'create') {
+        await createNewProject(form, session?.user?.id, token);
 
+        router.push('/');
       }
     } catch (error) {
-
+      console.log(error);
+    } finally {
+      setSsSubmitting(false)
     }
   };
 
@@ -116,9 +125,9 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ session, type }) => {
       <FormField
         type='url'
         title='GitHub URL'
-        state={form.gitHubUrl}
+        state={form.githubUrl}
         placeholder='https://github.com/adrianhajdin/project_nextjs13'
-        setState={(value) => handleStateChange('gitHubUrl', value)}
+        setState={(value) => handleStateChange('githubUrl', value)}
       />
       <CustomMenu
         title='Category'
